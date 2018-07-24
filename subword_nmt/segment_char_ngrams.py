@@ -12,6 +12,7 @@ import argparse
 from io import open
 argparse.open = open
 
+
 def create_parser(subparsers=None):
 
     if subparsers:
@@ -61,7 +62,7 @@ def character_splitter(line, vocabulary, separator, shortlist, n):
     for word in line.split():
         if word not in vocabulary or vocabulary[word] > shortlist:
             i = 0
-            while i * args.n < len(word):
+            while i * n < len(word):
                 subw = word[i * n:i * n + n]
                 i += 1
                 if i * n < len(word):
@@ -79,18 +80,6 @@ def segment_char_ngrams(args):
         newline = ' '.join(character_splitter(line, vocab, args.separator, args.shortlist, args.n))
         args.output.write(newline)
         args.output.write('\n')
-      for word in line.split():
-        if word not in vocab or vocab[word] > args.shortlist:
-          i = 0
-          while i*args.n < len(word):
-            args.output.write(word[i*args.n:i*args.n+args.n])
-            i += 1
-            if i*args.n < len(word):
-              args.output.write(args.separator)
-            args.output.write(' ')
-        else:
-          args.output.write(word + ' ')
-      args.output.write('\n')
 
 
 if __name__ == '__main__':
