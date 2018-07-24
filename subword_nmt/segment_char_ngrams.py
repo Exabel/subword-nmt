@@ -47,12 +47,38 @@ def create_parser(subparsers=None):
 
     return parser
 
-def segment_char_ngrams(args):
 
-    vocab = [line.split()[0] for line in args.vocab if len(line.split()) == 2]
-    vocab = dict((y,x) for (x,y) in enumerate(vocab))
+def parse_vocabulary(infile):
+    """
+    Parses the vocabulary for rare word character n_gram separation.
+    """
+    vocab = [line.split()[0] for line in infile if len(line.split()) == 2]
+    return dict((y, x) for (x, y) in enumerate(vocab))
+
+
+def character_splitter(line, vocabulary, separator, shortlist, n):
+    output = []
+    for word in line.split():
+        if word not in vocabulary or vocabulary[word] > shortlist:
+            i = 0
+            while i * args.n < len(word):
+                subw = word[i * n:i * n + n]
+                i += 1
+                if i * n < len(word):
+                    subw += separator
+                output.append(subw)
+        else:
+            output.append(word)
+    return output
+
+
+def segment_char_ngrams(args):
+    vocab = parse_vocabulary(args.vocab)
 
     for line in args.input:
+        newline = ' '.join(character_splitter(line, vocab, args.separator, args.shortlist, args.n))
+        args.output.write(newline)
+        args.output.write('\n')
       for word in line.split():
         if word not in vocab or vocab[word] > args.shortlist:
           i = 0
